@@ -15,8 +15,18 @@ def datetime_format(YYYY, MM, DD, hh, mm, ss):
 
 # Float-hex conversion
 def dec2hex(f):
+    if f==0:
+        return '00000000'
     return hex(struct.unpack('<I', struct.pack('<f', f))[0])[2:]
 
 def hex2dec(h):
-    return struct.unpack('!f', h.decode('hex'))[0]
-
+    ls = []
+    for dim in range(len(h)):
+        if h[dim]!= None:
+            sub = []
+            for i in range(0, len(h[dim]), 8):
+                sub.append(struct.unpack('!f', h[dim][0+i:8+i].decode('hex'))[0])
+            ls.append(sub)
+        else:
+            ls.append(None)
+    return ls
