@@ -10,7 +10,7 @@ database.open_connection()
 database.drop_table_if_exists("cam1")
 
 ### Create table ###
-database.create_table("cam1")
+database.create_table("cam1", max_track_length=100)
 
 fpath = '/data/yilong/20180612/10F 721_192.168.1.180--20180612-111849/'
 fname1 = '000154_000001_000002.mat' # everything

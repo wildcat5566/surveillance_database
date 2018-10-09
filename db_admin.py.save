@@ -1,11 +1,10 @@
 import pymysql
 import numpy as np
 import sql_encode as encode
-import os
-from scipy.io import loadmat, savemat
 
 class Database():
     def __init__(self):
+        """
         self.dimensions = {
             'face_bbox':         4,
             'face_confidence':   1,
@@ -25,7 +24,6 @@ class Database():
             'person_confidence': 1,
             'person_embed':      2
         }
-        """
 
         self.config = {
             'user': 'root',
@@ -104,10 +102,10 @@ class Database():
                 print(values[0:self.dimensions[key]])
 
             for dim in range(self.dimensions[key]):
-                if ('bbox' in key) or ('confidence' in key):
+                if('bbox' in key) or ('confidence' in key): #append values
                     sql += ("\'" + encode.dec2hex(float(values[dim])) + "\', ")
-                else:
-                    sql += (str(values[dim]) + ", ")
+                else: # Single floats
+                   sql += (values[dim]+ ", ")
 
         sql += "\'" + encode.datetime_format(2018, 11, 21, 5, 16, 2) + "\')"
         self.cursor.execute(sql)
@@ -129,12 +127,8 @@ class Database():
                 print(values[0:self.dimensions[key]])
 
             for dim in range(self.dimensions[key]):
-                if ('bbox' in key) or ('confidence' in key):
-                    sql += (key + str(dim) + "=concat(" + key + str(dim) + ",")
-                    sql += ("\'" + encode.dec2hex(float(values[dim])) + "\'),")
-
-                else:
-                    sql += (key + str(dim) + "=" + str(values[dim]) + ",")
+                sql += (key + str(dim) + "=concat(" + key + str(dim) + ",")
+                sql += ("\'" + encode.dec2hex(float(values[dim])) + "\'),")
 
         sql += ("timestamp='" + encode.datetime_format(2018, 10, 3, 21, 55, 28))
         sql += ("' where s_tracklet_num = "+str(s_tracklet_num))
@@ -156,10 +150,20 @@ class Database():
                 }
                 index = 2
                 for key in sorted(self.dimensions.keys()):
-                    if ('bbox' in key) or ('confidence' in key):
-                        records[key] = encode.hex2dec(list(f_data[index:(index + self.dimensions[key])]))
-                    else:
-                        records[key] = f_data[index:(index + self.dimensions[key])]
+                    records[key] = encode.hex2dec(list(f_data[index:(index + self.dimensions[key])]))
                     index += self.dimensions[key]
 
                 return records
+
+database = Database()
+database.open_connection()
+#database.drop_table_if_exists("cam1")
+
+### Create table ###
+#database.create_table("cam1")
+
+fpath = '/data/yilong/20180612/10F 721_192.168.1.180--20180612-111849/'
+fname1 = '000154_000001_000002.mat' # everything
+fname2 = '000154_000002_000003.mat' # No face
+
+select COLUMN_NAME, DATA_TYPE from information_schema.COLUMNS where TABLE_NAME='cam1';
